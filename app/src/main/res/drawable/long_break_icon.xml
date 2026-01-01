@@ -1,0 +1,16 @@
+<!--
+  ~ Copyright (c) 2025 Vrushal
+  ~
+  ~ This file is part of Zon - a minimalist pomodoro timer for Android.
+  -->
+
+<!-- Self-improvement/spa icon for Long Break mode -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M480,880q-17,0 -28.5,-11.5T440,840v-68q-101,-23 -170.5,-102T180,490q-4,-17 7,-33.5t29,-18.5q18,-3 33.5,9t19.5,30q20,85 88,139t153,54q85,0 153,-54t88,-139q4,-18 19.5,-30t33.5,-9q18,2 29,18.5t7,33.5q-21,101 -90.5,180T570,772v68q0,17 -11.5,28.5T530,880h-50ZM480,520q-35,0 -64,-22.5T380,441q-13,-43 -10,-91.5t22,-90.5q19,-42 60,-100t101,-98q60,40 101,98t60,100q19,42 22,90.5t-10,91.5q-7,34 -36,56.5t-64,22.5h-146ZM434,440h92q9,0 15,-7.5t5,-17.5q-7,-25 -17.5,-48.5T497,322q-19,-21 -35,-40t-19,-22q-3,3 -19,22t-35,40q-21,21 -31.5,44.5T340,415q-1,10 5,17.5t15,7.5h74Z" />
+</vector>

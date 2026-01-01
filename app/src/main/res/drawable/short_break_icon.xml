@@ -1,0 +1,16 @@
+<!--
+  ~ Copyright (c) 2025 Vrushal
+  ~
+  ~ This file is part of Zon - a minimalist pomodoro timer for Android.
+  -->
+
+<!-- Coffee cup icon for Short Break mode -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="960"
+    android:viewportHeight="960">
+    <path
+        android:fillColor="@android:color/white"
+        android:pathData="M200,840q-17,0 -28.5,-11.5T160,800q0,-17 11.5,-28.5T200,760h560q17,0 28.5,11.5T800,800q0,17 -11.5,28.5T760,840L200,840ZM280,720q-33,0 -56.5,-23.5T200,640L200,320q0,-33 23.5,-56.5T280,240h400v-40q0,-17 11.5,-28.5T720,160q17,0 28.5,11.5T760,200L760,360q0,50 -35,85t-85,35L280,480v160q0,0 0,0t0,0h320q0,0 0,0t0,0L600,520q0,-17 11.5,-28.5T640,480q17,0 28.5,11.5T680,520v120q0,33 -23.5,56.5T600,720L280,720ZM280,400h320v-80L280,320v80ZM280,400v-80,80Z" />
+</vector>

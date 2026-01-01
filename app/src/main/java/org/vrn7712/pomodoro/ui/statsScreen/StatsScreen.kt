@@ -1,0 +1,189 @@
+/*
+ * Copyright (c) 2025 Nishant Mishra
+ *
+ * This file is part of Zon (forked from Tomato) - a minimalist pomodoro timer for Android.
+ *
+ * Zon is free software: you can redistribute it and/or modify it under the terms of the GNU
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Zon is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ * the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with Zon.
+ * If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package org.vrn7712.pomodoro.ui.statsScreen
+
+import android.graphics.Typeface
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.animation.unveilIn
+import androidx.compose.animation.veilOut
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
+import org.vrn7712.pomodoro.R
+import org.vrn7712.pomodoro.ui.Screen
+import org.vrn7712.pomodoro.ui.statsScreen.components.ManualLogDialog
+import org.vrn7712.pomodoro.ui.statsScreen.screens.LastMonthScreen
+import org.vrn7712.pomodoro.ui.statsScreen.screens.LastWeekScreen
+import org.vrn7712.pomodoro.ui.statsScreen.screens.LastYearScreen
+import org.vrn7712.pomodoro.ui.statsScreen.screens.StatsMainScreen
+import org.vrn7712.pomodoro.ui.statsScreen.viewModel.StatsViewModel
+import org.vrn7712.pomodoro.ui.theme.AppFonts.googleFlex400
+import org.vrn7712.pomodoro.ui.theme.AppFonts.googleFlex600
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun StatsScreenRoot(
+    contentPadding: PaddingValues,
+    modifier: Modifier = Modifier,
+    viewModel: StatsViewModel = viewModel(factory = StatsViewModel.Factory)
+) {
+    val backStack = viewModel.backStack
+
+    val todayStat by viewModel.todayStat.collectAsStateWithLifecycle(null)
+    val allTimeTotalFocus by viewModel.allTimeTotalFocus.collectAsStateWithLifecycle(null)
+
+    val lastWeekMainChartData by viewModel.lastWeekMainChartData.collectAsStateWithLifecycle()
+    val lastWeekFocusHistoryValues by viewModel.lastWeekFocusHistoryValues.collectAsStateWithLifecycle()
+    val lastWeekFocusBreakdownValues by viewModel.lastWeekFocusBreakdownValues.collectAsStateWithLifecycle()
+
+    val lastMonthMainChartData by viewModel.lastMonthMainChartData.collectAsStateWithLifecycle()
+    val lastMonthCalendarData by viewModel.lastMonthCalendarData.collectAsStateWithLifecycle()
+    val lastMonthFocusBreakdownValues by viewModel.lastMonthFocusBreakdownValues.collectAsStateWithLifecycle()
+
+    val lastYearMainChartData by viewModel.lastYearMainChartData.collectAsStateWithLifecycle()
+    val lastYearFocusHeatmapData by viewModel.lastYearFocusHeatmapData.collectAsStateWithLifecycle()
+    val lastYearFocusBreakdownValues by viewModel.lastYearFocusBreakdownValues.collectAsStateWithLifecycle()
+    val lastYearMaxFocus by viewModel.lastYearMaxFocus.collectAsStateWithLifecycle()
+
+    val colorScheme = colorScheme
+
+    val hoursFormat = stringResource(R.string.hours_format)
+    val hoursMinutesFormat = stringResource(R.string.hours_and_minutes_format)
+    val minutesFormat = stringResource(R.string.minutes_format)
+
+    val resolver = LocalFontFamilyResolver.current
+    val axisTypeface = remember { resolver.resolve(googleFlex400).value as Typeface }
+    val markerTypeface = remember { resolver.resolve(googleFlex600).value as Typeface }
+    
+    // Manual log dialog state
+    var showManualLogDialog by remember { mutableStateOf(false) }
+
+    SharedTransitionLayout {
+        NavDisplay(
+            backStack = backStack,
+            onBack = backStack::removeLastOrNull,
+            transitionSpec = {
+                fadeIn().togetherWith(veilOut(targetColor = colorScheme.surfaceDim))
+            },
+            popTransitionSpec = {
+                unveilIn(initialColor = colorScheme.surfaceDim).togetherWith(fadeOut())
+            },
+            predictivePopTransitionSpec = {
+                unveilIn(initialColor = colorScheme.surfaceDim).togetherWith(fadeOut())
+            },
+            entryProvider = entryProvider {
+                entry<Screen.Stats.Main> {
+                    StatsMainScreen(
+                        contentPadding = contentPadding,
+                        lastWeekSummaryChartData = lastWeekMainChartData,
+                        lastMonthSummaryChartData = lastMonthMainChartData,
+                        lastYearSummaryChartData = lastYearMainChartData,
+                        todayStat = todayStat,
+                        allTimeTotalFocus = allTimeTotalFocus,
+                        lastWeekAverageFocusTimes = lastWeekFocusBreakdownValues.first,
+                        lastMonthAverageFocusTimes = lastMonthFocusBreakdownValues.first,
+                        lastYearAverageFocusTimes = lastYearFocusBreakdownValues.first,
+                        generateSampleData = viewModel::generateSampleData,
+                        hoursFormat = hoursFormat,
+                        hoursMinutesFormat = hoursMinutesFormat,
+                        minutesFormat = minutesFormat,
+                        axisTypeface = axisTypeface,
+                        markerTypeface = markerTypeface,
+                        onNavigate = {
+                            if (backStack.size < 2) backStack.add(it)
+                            else backStack[backStack.lastIndex] = it
+                        },
+                        onManualLog = { showManualLogDialog = true },
+                        modifier = modifier
+                    )
+                }
+
+                entry<Screen.Stats.LastWeek> {
+                    LastWeekScreen(
+                        contentPadding = contentPadding,
+                        focusBreakdownValues = lastWeekFocusBreakdownValues,
+                        focusHistoryValues = lastWeekFocusHistoryValues,
+                        mainChartData = lastWeekMainChartData,
+                        onBack = backStack::removeLastOrNull,
+                        hoursMinutesFormat = hoursMinutesFormat,
+                        hoursFormat = hoursFormat,
+                        minutesFormat = minutesFormat,
+                        axisTypeface = axisTypeface,
+                        markerTypeface = markerTypeface
+                    )
+                }
+
+                entry<Screen.Stats.LastMonth> {
+                    LastMonthScreen(
+                        contentPadding = contentPadding,
+                        focusBreakdownValues = lastMonthFocusBreakdownValues,
+                        calendarData = lastMonthCalendarData,
+                        mainChartData = lastMonthMainChartData,
+                        onBack = backStack::removeLastOrNull,
+                        hoursMinutesFormat = hoursMinutesFormat,
+                        hoursFormat = hoursFormat,
+                        minutesFormat = minutesFormat,
+                        axisTypeface = axisTypeface,
+                        markerTypeface = markerTypeface
+                    )
+                }
+
+                entry<Screen.Stats.LastYear> {
+                    LastYearScreen(
+                        contentPadding = contentPadding,
+                        focusBreakdownValues = lastYearFocusBreakdownValues,
+                        focusHeatmapData = lastYearFocusHeatmapData,
+                        heatmapMaxValue = lastYearMaxFocus,
+                        mainChartData = lastYearMainChartData,
+                        onBack = backStack::removeLastOrNull,
+                        hoursMinutesFormat = hoursMinutesFormat,
+                        hoursFormat = hoursFormat,
+                        minutesFormat = minutesFormat,
+                        axisTypeface = axisTypeface,
+                        markerTypeface = markerTypeface
+                    )
+                }
+            }
+        )
+    }
+    
+    // Manual log dialog
+    if (showManualLogDialog) {
+        ManualLogDialog(
+            onDismiss = { showManualLogDialog = false },
+            onConfirm = { focusMinutes, sessions ->
+                viewModel.logManualFocusTime(focusMinutes, sessions)
+            }
+        )
+    }
+}
